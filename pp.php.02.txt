@@ -1,0 +1,20 @@
+
+// < ?php 或 ? >
+
+global $_W, $_GPC;
+if ($_W["container"] == "wechat") {
+$openid = $_W["openid"];
+$member = pdo_fetch("select * from " . tablename(GARCIA_PREFIX . "members") . " where weid = :weid and openid = :openid", array(":weid" => $_W["uniacid"], ":openid" => $openid));
+setcookie("nickname", $member["nickname"], time() + 7200 * 60);
+setcookie("memberid", $member["id"], time() + 7200 * 60);
+setcookie("mobile", $member["mobile"], time() + 7200 * 60);
+setcookie("memberuid", $member["uid"], time() + 7200 * 60);
+$memberid = $_COOKIE["memberid"];
+$nick = $_COOKIE["nickname"];
+if (!empty($member["mobile"])) {
+$_share = pdo_fetch("select sharetitle as title,sharedesc as `desc`,sharepic as imgUrl from " . tablename(GARCIA_PREFIX . "basicsetting") . " where weid = :weid", array(":weid" => $_W["uniacid"]));
+if (empty($_share)) {
+if (!($_GPC["dopost"] == "bj")) {
+$set = pdo_fetch("select * from " . tablename(GARCIA_PREFIX . "shopshouses") . " where weid = :weid", array(":weid" => $_W["uniacid"]));
+if (!($_GPC["dopost"] == "addok")) {
+include $this->template("release_mm");
